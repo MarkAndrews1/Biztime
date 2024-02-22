@@ -27,7 +27,7 @@ router.get("/:id", async function(req, res, next){
         )
 
         if(invoiceRes.rows.length === 0){
-            throw new ExpressError(`Can not find company with a code of ${code}.`, 404)
+            throw new ExpressError(`Can not find company with a id of ${id}.`, 404)
         }
 
         const data = invoiceRes.rows[0]
@@ -74,13 +74,15 @@ router.put('/:id', async function(req, res, next){
         let paidDate = null
 
         const currResult = await db.query(
-            `SELECT paid FROM invoices where id=$1`,[id]
+            `SELECT paid FROM invoices WHERE id = $1`,[id]
         )
 
         const date = currResult.rows[0].paid_date
 
+        console.log(date)
+
         if(currResult.rows.length === 0){
-            throw new ExpressError(`Can not find company with a code of ${code}.`, 404)
+            throw new ExpressError(`Can not find company with a id of ${id}.`, 404)
         }
 
         if(!date && paid){
@@ -92,7 +94,7 @@ router.put('/:id', async function(req, res, next){
         }
 
         const result = await db.query(
-            `UPDATE invoices SET amt=$1, paid=$2, paid_date=$3, WHERE id=$4 RETURNING *`, [amt, paid, paidDate, id]
+            `UPDATE invoices SET amt=$1, paid=$2, paid_date=$3 WHERE id=$4 RETURNING *`, [amt, paid, paidDate, id]
         )
 
         return res.json({"invoice": result.rows[0]})
